@@ -1,0 +1,211 @@
+/* Generic in-window chrome: sheets, confirm dialogs, buttons, text fields,
+   toasts. All measured against native macOS dialogs and HUDs. */
+
+/* ── Sheets (modal create/edit) ── */
+.in-sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  background: color-mix(in srgb, #000 22%, transparent);
+}
+.in-sheet {
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  background: var(--in-content-bg);
+  border: 1px solid var(--in-hairline);
+  border-radius: 14px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  animation: in-sheet-pop 130ms ease-out;
+}
+@keyframes in-sheet-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .in-sheet {
+    animation: none;
+  }
+}
+.in-sheet-title {
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 16px 0;
+}
+.in-sheet-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.in-sheet-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--in-hairline);
+  background: color-mix(in srgb, var(--in-text-primary) 3%, transparent);
+}
+.in-sheet-footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* ── Text fields ── */
+.in-text-field {
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 14px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  color: var(--in-text-primary);
+  background: color-mix(in srgb, var(--in-text-primary) 5%, transparent);
+  border: 1px solid var(--in-hairline);
+  outline: none;
+}
+.in-text-field:focus {
+  border-color: var(--in-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--in-accent) 22%, transparent);
+}
+.in-field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--in-text-secondary);
+  margin-top: 2px;
+}
+
+/* ── Buttons ── */
+.in-btn {
+  appearance: none;
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 13px;
+  border-radius: 8px;
+  border: 1px solid var(--in-hairline);
+  background: color-mix(in srgb, var(--in-text-primary) 5%, transparent);
+  color: var(--in-text-primary);
+  cursor: default;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.in-btn:hover {
+  background: color-mix(in srgb, var(--in-text-primary) 9%, transparent);
+}
+.in-btn-primary {
+  background: var(--in-accent);
+  border-color: transparent;
+  color: #fff;
+}
+.in-btn-primary:hover {
+  background: color-mix(in srgb, var(--in-accent) 88%, #000);
+}
+.in-btn-primary:disabled {
+  opacity: 0.45;
+}
+.in-btn-danger {
+  background: #ff453a;
+  border-color: transparent;
+  color: #fff;
+}
+.in-btn-danger:hover {
+  background: color-mix(in srgb, #ff453a 88%, #000);
+}
+.in-btn-danger-text {
+  border-color: transparent;
+  background: none;
+  color: #ff453a;
+  padding-left: 4px;
+}
+.in-btn-danger-text:hover {
+  background: color-mix(in srgb, #ff453a 12%, transparent);
+}
+
+/* ── Confirm dialog (goes inside .in-sheet-scrim) ── */
+.in-confirm {
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  background: var(--in-content-bg);
+  border: 1px solid var(--in-hairline);
+  border-radius: 14px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  padding: 18px;
+  animation: in-sheet-pop 130ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .in-confirm {
+    animation: none;
+  }
+}
+.in-confirm-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.in-confirm-body {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--in-text-secondary);
+  margin-bottom: 16px;
+}
+.in-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* ── Toasts ── */
+.in-toast-host {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+.in-toast {
+  appearance: none;
+  font: inherit;
+  font-size: 12.5px;
+  color: #fff;
+  background: rgba(30, 30, 32, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 9px 15px;
+  border-radius: 10px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  cursor: default;
+  backdrop-filter: blur(20px);
+  animation: in-toast-in 140ms ease-out;
+}
+@keyframes in-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .in-toast {
+    animation: none;
+  }
+}

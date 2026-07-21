@@ -1,0 +1,228 @@
+/* Native source-list sidebar: rows, section headers, disclosure triangles,
+   and the section-collapse choreography.
+
+   Metrics measured off 2x screenshots of SF Symbols/Home/Photos sidebars:
+   28px row pitch (no inter-row gaps), 10px side insets, 5px radius, icon
+   column left edge at 28px from the window edge, chevron centered at 17px. */
+
+.in-sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 8px;
+}
+
+.in-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Rows ──
+   Native style: no hover state, flat gray rounded selection at regular
+   weight — exactly what AppKit/SwiftUI sidebars do out of the box. */
+.in-sidebar-item {
+  appearance: none;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--in-text-primary);
+  text-align: left;
+  padding: 6px 7px 6px 2px;
+  border-radius: 5px;
+  outline: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  cursor: default;
+}
+
+.in-sidebar-item.is-active {
+  background: var(--in-item-active);
+}
+
+/* Emphasized selection: while the sidebar is the focused responder (track
+   focus yourself — e.g. on mousedown — and toggle "in-sidebar-focused" on the
+   shell), the selected row fills with the accent color and its content goes
+   white; the gray selection above covers focus-elsewhere-in-window. The
+   !important overrides per-item inline tint colors, which must also go white. */
+:root:not(.in-window-inactive) .in-sidebar-focused .in-sidebar-item.is-active {
+  background: var(--in-accent);
+  color: #fff;
+}
+:root:not(.in-window-inactive)
+  .in-sidebar-focused
+  .in-sidebar-item.is-active
+  :is(.in-row-icon, .in-row-badge, .in-disclosure) {
+  color: #fff !important;
+}
+
+/* Sidebar icons are accent/tint colored, like every native source list.
+   line-height caps the flex row at the native 28px pitch (16 + 2×6 padding). */
+.in-row-icon {
+  width: 19px;
+  flex-shrink: 0;
+  font-size: 15px;
+  line-height: 16px;
+  text-align: center;
+  color: var(--in-accent);
+}
+
+.in-row-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Counts are plain gray numbers (Notes/Mail style), not pills. */
+.in-row-badge {
+  flex-shrink: 0;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--in-text-secondary);
+}
+
+/* ── Disclosure triangles ── */
+.in-disclosure,
+.in-disclosure-spacer {
+  width: 10px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.in-disclosure {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--in-text-secondary);
+  cursor: default;
+  outline: none;
+}
+.in-disclosure .sf-symbol {
+  font-size: 9px;
+  transition: transform 120ms ease;
+}
+.in-disclosure.is-open .sf-symbol {
+  transform: rotate(90deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  .in-disclosure .sf-symbol {
+    transition: none;
+  }
+}
+
+/* Drag-and-drop target highlight. */
+.in-sidebar-item.is-drop-target {
+  background: color-mix(in srgb, var(--in-accent) 20%, transparent) !important;
+  box-shadow: inset 0 0 0 1px var(--in-accent);
+}
+
+/* ── Section headers ──
+   Native style: title-case tertiary-gray label, no hover background, and a
+   trailing collapse chevron that only appears while hovering the header row
+   (down when expanded, right when collapsed) — SF Symbols/Photos behavior. */
+.in-section-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 14px;
+  padding: 0 6px 2px 7px;
+  height: 18px;
+}
+.in-section-header:first-child {
+  margin-top: 0;
+}
+.in-section-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--in-text-tertiary);
+}
+.in-section-chevron {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--in-text-tertiary);
+  opacity: 0;
+}
+.in-section-header:hover .in-section-chevron {
+  opacity: 1;
+}
+.in-section-action {
+  appearance: none;
+  border: none;
+  background: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--in-text-tertiary);
+  cursor: default;
+  outline: none;
+  opacity: 0;
+}
+.in-section-header:hover .in-section-action {
+  opacity: 1;
+}
+.in-section-action:hover {
+  color: var(--in-text-primary);
+}
+.in-section-action .sf-symbol {
+  font-size: 11px;
+}
+.in-section-empty {
+  font-size: 12px;
+  color: var(--in-text-secondary);
+  padding: 3px 10px;
+  opacity: 0.7;
+}
+
+/* ── Section collapse animation ──
+   Grid 1fr→0fr animates the height; the inner box is bottom-justified with a
+   hidden overflow, so shrinking clips rows from the TOP while the survivors
+   slide up — the native macOS section-collapse choreography. flex-shrink: 0
+   keeps the scroll container from squashing sections (grid items with hidden
+   overflow have a 0 automatic minimum). */
+.in-section-body {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 240ms ease;
+  flex-shrink: 0;
+}
+.in-section-body.is-collapsed {
+  grid-template-rows: 0fr;
+}
+.in-section-body-inner {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.in-section-body.is-collapsed .in-section-body-inner {
+  /* Hide after the height animation ends so collapsed rows are untabbable/unseen. */
+  visibility: hidden;
+  transition: visibility 0s 240ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .in-section-body {
+    transition: none;
+  }
+  .in-section-body.is-collapsed .in-section-body-inner {
+    transition: none;
+  }
+}

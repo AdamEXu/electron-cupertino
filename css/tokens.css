@@ -1,0 +1,54 @@
+/* electron-cupertino design tokens. Colors and metrics measured off 2x screenshots of
+   native macOS apps (Notes, Finder, Photos, SF Symbols, Safari). Light values
+   are the defaults; dark values follow the system appearance. */
+:root {
+  --in-sidebar-width: 220px;
+  --in-titlebar-height: 52px;
+
+  --in-content-bg: #ffffff;
+  --in-text-primary: rgba(0, 0, 0, 0.85);
+  --in-text-secondary: rgba(0, 0, 0, 0.5);
+  --in-text-tertiary: rgba(0, 0, 0, 0.38);
+  --in-toolbar-icon: #666666;
+  --in-toolbar-icon-press: #303030;
+  --in-accent: #0a82ff;
+  --in-item-hover: rgba(0, 0, 0, 0.06);
+  --in-item-active: rgba(0, 0, 0, 0.1);
+  --in-hairline: rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --in-content-bg: #1f1f21;
+    --in-text-primary: rgba(255, 255, 255, 0.88);
+    --in-text-secondary: rgba(255, 255, 255, 0.55);
+    --in-text-tertiary: rgba(255, 255, 255, 0.4);
+    --in-toolbar-icon: rgba(255, 255, 255, 0.62);
+    --in-toolbar-icon-press: rgba(255, 255, 255, 0.9);
+    --in-item-hover: rgba(255, 255, 255, 0.07);
+    --in-item-active: rgba(255, 255, 255, 0.12);
+    --in-hairline: rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* Opt-in base: put class "in-native" on <body>. Transparent background is
+   required for the window's NSVisualEffectView vibrancy to show through. */
+body.in-native {
+  margin: 0;
+  height: 100vh;
+  background: transparent;
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--in-text-primary);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+  overflow: hidden;
+}
+
+/* SF Symbols render as PUA glyphs from the *installed* SF Pro font. The family
+   must be named explicitly — system-ui does not resolve PUA codepoints.
+   Nothing is bundled: macOS ships the glyphs; see README for licensing. */
+.sf-symbol {
+  font-family: 'SF Pro', -apple-system, system-ui, sans-serif;
+}

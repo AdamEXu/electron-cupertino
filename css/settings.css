@@ -1,0 +1,299 @@
+/* Settings window chrome — colors/metrics sampled pixel-by-pixel from 2x
+   screenshots of Finder Settings, focused and unfocused side by side.
+   Focused:   chrome #F1F2F1, content #EDEEED, title #474847 bold, tabs #6C6C6C
+              with the active one at #0066EB, controls accented blue.
+   Unfocused: macOS keeps BODY text at full strength and desaturates the rest —
+              chrome #E7E8E7, title #A7A8A7, active tab #626262, other tabs
+              #ADADAD, and every accent fill (checkmarks, popup caps) collapses
+              to a plain #262626 mark on white. That last part is the tell: an
+              unfocused native window has NO blue in it anywhere.
+   Dark-mode values are derived from these, not measured. */
+:root {
+  --in-set-chrome: #f1f2f1;
+  --in-set-content: #edeeed;
+  --in-set-hairline: #c8c8c8;
+  --in-set-pill: rgba(0, 0, 0, 0.055);
+  --in-set-pill-press: rgba(0, 0, 0, 0.11);
+  --in-set-title: #474847;
+  --in-set-tab: #6c6c6c;
+  --in-set-tab-active: #0066eb;
+  --in-set-check-bg: #ffffff;
+  --in-set-check-border: rgba(0, 0, 0, 0.22);
+  /* Accent-bearing control art, swapped wholesale when the window blurs. */
+  --in-set-check-fill: linear-gradient(#2991ff, #057cff);
+  --in-set-check-mark: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"><path d="M3.2 7.3 L5.8 9.9 L10.8 4.2" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  --in-set-popup-cap: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%232991FF"/><stop offset="1" stop-color="%23057CFF"/></linearGradient></defs><rect width="16" height="16" rx="4" fill="url(%23g)"/><path d="M5.2 6.4 L8 3.6 L10.8 6.4 M5.2 9.6 L8 12.4 L10.8 9.6" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --in-set-chrome: #38383a;
+    --in-set-content: #2c2c2e;
+    --in-set-hairline: rgba(0, 0, 0, 0.45);
+    --in-set-pill: rgba(255, 255, 255, 0.1);
+    --in-set-pill-press: rgba(255, 255, 255, 0.17);
+    --in-set-title: rgba(255, 255, 255, 0.85);
+    --in-set-tab: rgba(255, 255, 255, 0.62);
+    --in-set-tab-active: #409cff;
+    --in-set-check-bg: #545458;
+    --in-set-check-border: rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* ── Unfocused window: desaturate the chrome, strip every accent ──
+   <SettingsWindow> toggles is-inactive automatically (main pushes key-window
+   state through the preload bridge); without React, toggle it yourself. */
+.in-settings-window.is-inactive {
+  --in-set-chrome: #e7e8e7;
+  --in-set-title: #a7a8a7;
+  --in-set-tab: #adadad;
+  --in-set-tab-active: #626262;
+  --in-set-check-fill: none;
+  --in-set-check-mark: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"><path d="M3.2 7.3 L5.8 9.9 L10.8 4.2" fill="none" stroke="%23262626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  --in-set-popup-cap: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path d="M5.2 6.4 L8 3.6 L10.8 6.4 M5.2 9.6 L8 12.4 L10.8 9.6" fill="none" stroke="%23262626" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+}
+@media (prefers-color-scheme: dark) {
+  .in-settings-window.is-inactive {
+    --in-set-chrome: #313133;
+    --in-set-title: rgba(255, 255, 255, 0.35);
+    --in-set-tab: rgba(255, 255, 255, 0.3);
+    --in-set-tab-active: rgba(255, 255, 255, 0.55);
+    --in-set-check-mark: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"><path d="M3.2 7.3 L5.8 9.9 L10.8 4.2" fill="none" stroke="rgb(235,235,235)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+    --in-set-popup-cap: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path d="M5.2 6.4 L8 3.6 L10.8 6.4 M5.2 9.6 L8 12.4 L10.8 9.6" fill="none" stroke="rgb(235,235,235)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  }
+}
+
+.in-settings-window {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--in-set-content);
+  overflow: hidden;
+}
+
+/* ── Titlebar + tabs (one drag surface, like the native toolbar) ── */
+.in-settings-chrome {
+  flex-shrink: 0;
+  background: var(--in-set-chrome);
+  border-bottom: 1px solid var(--in-set-hairline);
+  -webkit-app-region: drag;
+  user-select: none;
+}
+/* Measured bold (700) and a mid gray — NOT near-black; at 600/#242424 it read
+   noticeably lighter-stroked and darker than Finder's. */
+.in-settings-title {
+  height: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--in-set-title);
+}
+.in-settings-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  padding: 2px 0 8px;
+}
+.in-settings-tab {
+  -webkit-app-region: no-drag;
+  appearance: none;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: default;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 52px;
+  padding: 4px 8px 3px;
+  border-radius: 6px;
+  color: var(--in-set-tab);
+}
+/* Hover shows the same pill as the selected tab; pressing darkens it. */
+.in-settings-tab:hover {
+  background: var(--in-set-pill);
+}
+.in-settings-tab:active {
+  background: var(--in-set-pill-press);
+}
+.in-settings-tab.is-active {
+  background: var(--in-set-pill);
+  color: var(--in-set-tab-active);
+}
+.in-settings-tab-icon {
+  font-size: 19px;
+  line-height: 22px;
+}
+.in-settings-tab-label {
+  font-size: 11px;
+}
+
+/* ── Pane content ── */
+.in-settings-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+.in-settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* Checkbox rows carry no label of their own, so they align with the control
+   column (Safari / System Settings). The window is sized to fit the longest
+   one — native panes widen rather than wrap a control label. */
+.in-settings-checkgroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.in-settings-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--in-text-primary);
+}
+/* The label never wraps, and the box never gets squashed out of square by a
+   long one — without flex-shrink:0 the 14px box compresses into a rectangle. */
+.in-settings-check > span {
+  white-space: nowrap;
+}
+.in-settings-check input {
+  appearance: none;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border-radius: 3.5px;
+  background: var(--in-set-check-bg);
+  box-shadow:
+    inset 0 0 0 0.5px var(--in-set-check-border),
+    0 0.5px 1px rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+/* Checked fill measured off Safari: vertical gradient #2991FF → #057CFF. The
+   mark itself measures 9×8 inside the 14px box at ~2px stroke. When the window
+   blurs, the fill drops out and the mark inks dark on white. */
+.in-settings-check input:checked {
+  background:
+    var(--in-set-check-mark) center / 14px no-repeat,
+    var(--in-set-check-fill);
+  box-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.15);
+}
+/* Unfocused: no blue body, so the box needs its resting border back. */
+.in-settings-window.is-inactive .in-settings-check input:checked {
+  background:
+    var(--in-set-check-mark) center / 14px no-repeat,
+    var(--in-set-check-bg);
+  box-shadow:
+    inset 0 0 0 0.5px var(--in-set-check-border),
+    0 0.5px 1px rgba(0, 0, 0, 0.1);
+}
+.in-settings-caption {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--in-text-secondary);
+  padding-left: 21px;
+  max-width: 340px;
+}
+/* Captions that sit under a non-checkbox control need no checkbox indent. */
+.in-settings-caption-flush {
+  padding-left: 0;
+}
+
+/* ── Native settings form: right-aligned labels, controls in a second column.
+   Safari metrics @2x: controls 21px tall, radius 5.5, rows on a ~33px pitch
+   (12px gaps); labels NEVER wrap — the label column is generous instead. ── */
+.in-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--in-text-primary);
+}
+.in-settings-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+/* Rows whose control column stacks (checkbox groups, a control + caption)
+   align the label to the first line rather than the block's center. */
+.in-settings-row-stack {
+  align-items: start;
+}
+/* Extra air where a new group begins — native panes (Finder, Safari, Messages)
+   separate groups with whitespace, never a rule. */
+.in-settings-row-gap {
+  margin-top: 10px;
+}
+.in-settings-label {
+  text-align: right;
+  white-space: nowrap;
+  color: var(--in-text-primary);
+}
+.in-settings-value {
+  color: var(--in-text-secondary);
+  line-height: 21px;
+}
+
+/* NSPopUpButton: white 21px body, and a 16×16 blue-gradient cap (measured
+   #2991FF→#057CFF, radius 4) inset 2.5px at the right with white chevrons. */
+.in-settings-popup {
+  appearance: none;
+  font: inherit;
+  font-size: 13px;
+  height: 21px;
+  color: var(--in-text-primary);
+  background:
+    var(--in-set-popup-cap) right 2.5px center / 16px no-repeat,
+    var(--in-set-check-bg);
+  border: none;
+  border-radius: 5.5px;
+  padding: 0 26px 0 8px;
+  box-shadow:
+    inset 0 0 0 0.5px var(--in-set-check-border),
+    0 0.5px 1.5px rgba(0, 0, 0, 0.12);
+  outline: none;
+  justify-self: start;
+}
+
+/* NSButton (push): same 21px body/radius as the popup. */
+.in-settings-button {
+  appearance: none;
+  font: inherit;
+  font-size: 13px;
+  height: 21px;
+  color: var(--in-text-primary);
+  background: var(--in-set-check-bg);
+  border: none;
+  border-radius: 5.5px;
+  padding: 0 12px;
+  box-shadow:
+    inset 0 0 0 0.5px var(--in-set-check-border),
+    0 0.5px 1.5px rgba(0, 0, 0, 0.12);
+  outline: none;
+  cursor: default;
+  align-self: flex-start;
+}
+.in-settings-button:active {
+  background: var(--in-set-pill-press);
+}
+
+/* Keyboard focus ring. The controls above clear `outline` to draw their own
+   bodies, which would otherwise leave Full Keyboard Access with no focus
+   indication at all — something no shipping Apple app does. AppKit draws a
+   ~3px accent halo outside the control's own border. */
+.in-settings-popup:focus-visible,
+.in-settings-button:focus-visible,
+.in-settings-tab:focus-visible,
+.in-settings-check input:focus-visible {
+  box-shadow:
+    inset 0 0 0 0.5px var(--in-set-check-border),
+    0 0 0 3px color-mix(in srgb, var(--in-accent) 45%, transparent);
+}

@@ -1,0 +1,11 @@
+/* electron-cupertino — everything. Import individual files instead if you only need part:
+   tokens.css   design tokens + body base + .sf-symbol   (required by the rest)
+   shell.css    app shell: vibrancy sidebar strip, collapse, titlebar band
+   sidebar.css  source-list rows, sections, disclosure
+   settings.css settings window chrome + native form controls
+   controls.css sheets, dialogs, buttons, fields, toasts */
+@import './tokens.css';
+@import './shell.css';
+@import './sidebar.css';
+@import './settings.css';
+@import './controls.css';
