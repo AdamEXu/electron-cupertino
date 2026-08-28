@@ -4,6 +4,9 @@
   "description": "Make your Electron app look genuinely macOS-native: vibrancy window setup, measured sidebar & settings chrome, SF Symbols rendering.",
   "license": "MIT",
   "author": "Adam Xu",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "type": "module",
   "sideEffects": [
     "*.css"

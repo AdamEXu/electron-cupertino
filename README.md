@@ -23,7 +23,8 @@ npm install electron-cupertino
 ```
 
 Peer deps: `electron` ≥ 28. `react` ≥ 18 only if you use the components —
-the CSS works with any framework or none.
+the CSS works with any framework or none. Developing this package requires
+Node ≥ 22.12.0 (`electron@44` as a devDependency).
 
 ## Quick start
 
